@@ -1,0 +1,25 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# VSCode
+.vscode/
+
+# JetBrains IDEs (WebStorm, PyCharm, IntelliJ)
+.idea/
+*.iml
+
+# Node.js (if dependencies added later)
+node_modules/
+npm-debug.log
+
+# Editor backup files
+*~
+*.swp
+*.bak

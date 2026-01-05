@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DD60 Font Atlas Generator v1.1</title>
+    <link rel="stylesheet" href="generator.css">
+</head>
+<body>
+    <h1>DD60 Font Atlas Generator <span class="version">v1.1</span></h1>
+
+    <div id="browserWarning" class="browser-warning">
+        Warning: This application has only been tested in Chrome. Some features may not work correctly in other browsers.
+    </div>
+
+    <div class="container">
+        <div class="info">
+            <div class="controls">
+                <div class="control-row">
+                    <label for="renderMode" data-tooltip="Font: System font rendering. Character ROM: Vector strokes from CDC ROM data. ROM + Physics: CRT beam simulation with analog filter effects.">Render Mode</label>
+                    <select id="renderMode">
+                        <option value="font">Font</option>
+                        <option value="vector">Character ROM</option>
+                        <option value="crt" selected>ROM + Physics</option>
+                    </select>
+                </div>
+
+                <div class="control-row">
+                    <label for="characterScale" data-tooltip="CDC character size multiplier. Matches DD60 hardware scaling: 1× (8×8), 2× (16×16), 4× (32×32). Larger scales show more pronounced filter effects.">Character Scale</label>
+                    <select id="characterScale">
+                        <option value="1" selected>1× Normal</option>
+                        <option value="2">2× Double</option>
+                        <option value="4">4× Quad</option>
+                    </select>
+                </div>
+
+                <div class="control-row">
+                    <label for="pixelScale" data-tooltip="Output resolution multiplier. Higher values produce smoother curves and finer detail. Does not affect character proportions.">Pixel Scale</label>
+                    <select id="pixelScale">
+                        <option value="1">1×</option>
+                        <option value="1.5">1.5×</option>
+                        <option value="2">2×</option>
+                        <option value="2.5">2.5×</option>
+                        <option value="3">3×</option>
+                        <option value="4">4×</option>
+                        <option value="5">5×</option>
+                        <option value="6">6×</option>
+                        <option value="7">7×</option>
+                        <option value="8">8×</option>
+                        <option value="10">10×</option>
+                        <option value="16" selected>16×</option>
+                    </select>
+                </div>
+
+                <div class="control-row">
+                    <label for="filterCutoff" data-tooltip="Biquad low-pass filter cutoff frequency (fraction of sample rate). Lower values produce more corner rounding and slower response. Simulates deflection amplifier bandwidth.">X/Y Filter Cutoff</label>
+                    <input type="range" id="filterCutoff" min="0" max="1" step="0.002" value="0.5">
+                    <span class="value-display" id="filterCutoffValue">0.080</span>
+                </div>
+
+                <div class="control-row">
+                    <label for="filterQ" data-tooltip="Biquad filter resonance. 0.707 = Butterworth (no overshoot). Higher values add overshoot at corners. Lower values produce sluggish, overdamped response.">X/Y Q Factor</label>
+                    <input type="range" id="filterQ" min="0.3" max="2.0" step="0.01" value="0.707">
+                    <span class="value-display" id="filterQValue">0.71</span>
+                </div>
+
+                <div class="control-row">
+                    <label for="filterZ" data-tooltip="Beam intensity filter retention. 0 = instant on/off. Higher values create soft stroke endpoints as beam fades in/out gradually.">Z Filter Retention</label>
+                    <input type="range" id="filterZ" min="0" max="0.99" step="0.01" value="0">
+                    <span class="value-display" id="filterZValue">0</span>
+                </div>
+
+                <div class="control-row">
+                    <label for="brightness" data-tooltip="Spot intensity multiplier. Higher values produce brighter traces. Values above 1.0 may cause saturation (clipping to white in additive mode).">Brightness</label>
+                    <input type="range" id="brightness" min="0" max="3.0" step="0.01" value="1.0">
+                    <span class="value-display" id="brightnessValue">1.0</span>
+                </div>
+
+                <div class="control-row">
+                    <label for="beamWidth" data-tooltip="Spot radius in pixels. Simulates CRT beam focus. Larger values produce softer, more diffuse traces.">Beam Width</label>
+                    <input type="range" id="beamWidth" min="0.2" max="10" step="0.1" value="1.5">
+                    <span class="value-display" id="beamWidthValue">1.5</span>
+                </div>
+
+                <div class="control-row">
+                    <label for="blendMode" data-tooltip="Normal: Each spot replaces pixels. Additive: Spots accumulate brightness, simulating phosphor excitation. Produces white at high intensity (saturation).">Blend Mode</label>
+                    <select id="blendMode">
+                        <option value="source-over" selected>Normal</option>
+                        <option value="lighter">Additive</option>
+                    </select>
+                </div>
+
+                <div class="control-row">
+                    <label for="showGrid" data-tooltip="Overlay checkerboard pattern showing cell boundaries. Useful for verifying pixel alignment.">Show Checkerboard</label>
+                    <input type="checkbox" id="showGrid">
+                </div>
+
+                <div class="control-row">
+                    <label for="showOrigin" data-tooltip="Show character origin markers. Origin (0,0) is offset from cell corner to allow margin for beam effects.">Show Origin</label>
+                    <input type="checkbox" id="showOrigin">
+                </div>
+
+                <button id="downloadBtn">Download PNG</button>
+            </div>
+
+            <div class="info-panel">
+                <span><span class="label">Grid:</span> 8×8 (64 cells)</span>
+                <span><span class="label">Cell Size:</span> <span id="infoCellSize">8×8</span></span>
+                <span><span class="label">Cell Pixel Size:</span> <span id="infoCellPixelSize">8×8</span> px</span>
+                <span><span class="label">Origin:</span> (<span id="infoOriginOffset">1,1</span>)</span>
+                <span><span class="label">Atlas:</span> <span id="infoAtlasSize">64×64</span> units</span>
+                <span><span class="label">Display:</span> <span id="infoDisplaySize">512×512</span> px</span>
+            </div>
+        </div>
+
+        <div class="actual-size-panel">
+            <h2>Font Atlas - Actual Size (<span id="actualSizeInfo">64×64</span> px)</h2>
+            <div class="canvas-wrapper">
+                <canvas id="actualSizeCanvas"></canvas>
+            </div>
+        </div>
+
+        <div class="detail-panel">
+            <h2>Character Detail</h2>
+            <div class="detail-controls">
+                <div class="control-row">
+                    <label for="detailChar" data-tooltip="Select character to display in detail view with ROM data tables.">Detail Character</label>
+                    <select id="detailChar"></select>
+                </div>
+                <div class="control-row">
+                    <label for="detailMag" data-tooltip="Display magnification for detail view. Does not affect rendering resolution, only display size.">Detail Magnification</label>
+                    <select id="detailMag">
+                        <option value="1">1×</option>
+                        <option value="2">2×</option>
+                        <option value="4">4×</option>
+                        <option value="6" selected>6×</option>
+                        <option value="8">8×</option>
+                        <option value="16">16×</option>
+                        <option value="32">32×</option>
+                        <option value="64">64×</option>
+                    </select>
+                </div>
+                <span><span class="label">Char Scale:</span> <span id="detailCharScale">1×</span></span>
+                <span><span class="label">Pixel Scale:</span> <span id="detailPixelScale">1×</span></span>
+                <span><span class="label">Cell Pixel Size:</span> <span id="detailCellPixelSize">8×8</span> px</span>
+            </div>
+            <div class="detail-content">
+                <div class="detail-canvas-wrapper">
+                    <canvas id="detailCanvas"></canvas>
+                </div>
+                <div id="originNote" class="origin-note" style="display: none;">
+                    Note: Origin blurred - not at exact pixel location
+                </div>
+                <div class="tables-row">
+                    <div class="rom-table-wrapper">
+                        <h3>ROM Matrix</h3>
+                        <table class="rom-table" id="romTable">
+                            <thead>
+                                <tr>
+                                    <th>T</th>
+                                    <th>V<sub>1</sub></th>
+                                    <th>V<sub>2</sub></th>
+                                    <th>H<sub>1</sub></th>
+                                    <th>H<sub>2</sub></th>
+                                    <th>U</th>
+                                </tr>
+                            </thead>
+                            <tbody id="romTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="rom-table-wrapper">
+                        <h3>Vector Output</h3>
+                        <table class="rom-table" id="vectorTable">
+                            <thead>
+                                <tr>
+                                    <th>T</th>
+                                    <th>X</th>
+                                    <th>Y</th>
+                                    <th>Beam</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vectorTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="rom-table-wrapper">
+                        <h3>Simplified</h3>
+                        <table class="rom-table" id="simplifiedTable">
+                            <thead>
+                                <tr>
+                                    <th>X</th>
+                                    <th>Y</th>
+                                    <th>Beam</th>
+                                </tr>
+                            </thead>
+                            <tbody id="simplifiedTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+// @ts-check
+
+import { BASE_CELL_SIZE, ATLAS_SIZE, DEFAULT_CONFIG, CDC_CHARACTERS } from './config.js';
+import { updateRomTable, updateVectorTable, updateSimplifiedTable } from './tableUpdater.js';
+import { bindControls, updateControlStates } from './controlBinder.js';
+import { fontModeRenderer } from './renderers/fontMode.js';
+import { vectorModeRenderer } from './renderers/vectorMode.js';
+import { crtModeRenderer } from './renderers/crtMode.js';
+
+/**
+ * DD60 Font Atlas Generator
+ *
+ * Renders characters into an 8x8 grid atlas (64 cells).
+ * Supports Cell Size 8, 16, 32 display units (at Pixel Scale 1×).
+ */
+
+/** Runtime configuration (mutable copy of defaults) */
+const CONFIG = { ...DEFAULT_CONFIG };
+
+/**
+ * Available renderers mapped by mode
+ * @type {Object.<string, import('./renderers/types.js').Renderer>}
+ */
+const RENDERERS = {
+    font: fontModeRenderer,
+    vector: vectorModeRenderer,
+    crt: crtModeRenderer,
+};
+
+/** @type {import('./renderers/types.js').Renderer} */
+let currentRenderer = RENDERERS[CONFIG.renderMode] || fontModeRenderer;
+
+/** @type {HTMLCanvasElement|null} */
+let detailCanvas = null;
+
+/** @type {CanvasRenderingContext2D|null} */
+let detailCtx = null;
+
+/** @type {HTMLCanvasElement|null} */
+let actualSizeCanvas = null;
+
+/** @type {CanvasRenderingContext2D|null} */
+let actualSizeCtx = null;
+
+/**
+ * Initialize canvas and context
+ */
+function init() {
+    // Initialize detail canvas
+    detailCanvas = /** @type {HTMLCanvasElement} */ (document.getElementById('detailCanvas'));
+    if (detailCanvas) {
+        detailCtx = detailCanvas.getContext('2d');
+    }
+
+    // Initialize actual size canvas
+    actualSizeCanvas = /** @type {HTMLCanvasElement} */ (document.getElementById('actualSizeCanvas'));
+    if (actualSizeCanvas) {
+        actualSizeCtx = actualSizeCanvas.getContext('2d');
+    }
+
+    // Populate character dropdown
+    populateCharacterDropdown();
+
+    // Set initial control states based on renderer
+    updateControlStates(currentRenderer.supportedControls);
+
+    render();
+}
+
+/**
+ * Populate the character selection dropdown with CDC characters
+ */
+function populateCharacterDropdown() {
+    const select = /** @type {HTMLSelectElement} */ (document.getElementById('detailChar'));
+    if (!select) return;
+
+    // Add only non-space characters (positions 1-45)
+    for (let i = 1; i < 46; i++) {
+        const char = CDC_CHARACTERS[i];
+        if (char && char !== ' ') {
+            const option = document.createElement('option');
+            option.value = char;
+            option.textContent = char;
+            if (char === CONFIG.detailChar) {
+                option.selected = true;
+            }
+            select.appendChild(option);
+        }
+    }
+}
+
+/**
+ * Update all info panels with current scaled values
+ */
+function updateInfoPanel() {
+    const cellSize = BASE_CELL_SIZE * CONFIG.characterScale;
+    const cellPixelSize = cellSize * CONFIG.pixelScale;
+    const atlasSize = ATLAS_SIZE * CONFIG.characterScale;
+    const canvasSize = atlasSize * CONFIG.pixelScale;
+    const originOffset = CONFIG.originOffsetX * CONFIG.characterScale;
+
+    // Main info panel
+    const infoCellSize = document.getElementById('infoCellSize');
+    const infoCellPixelSize = document.getElementById('infoCellPixelSize');
+    const infoOriginOffset = document.getElementById('infoOriginOffset');
+    const infoAtlasSize = document.getElementById('infoAtlasSize');
+    const infoDisplaySize = document.getElementById('infoDisplaySize');
+
+    if (infoCellSize) infoCellSize.textContent = `${cellSize}×${cellSize}`;
+    if (infoCellPixelSize) infoCellPixelSize.textContent = `${cellPixelSize}×${cellPixelSize}`;
+    if (infoOriginOffset) infoOriginOffset.textContent = `${originOffset},${originOffset}`;
+    if (infoAtlasSize) infoAtlasSize.textContent = `${atlasSize}×${atlasSize}`;
+    if (infoDisplaySize) infoDisplaySize.textContent = `${canvasSize}×${canvasSize}`;
+
+    // Actual size panel
+    const actualSizeInfo = document.getElementById('actualSizeInfo');
+    if (actualSizeInfo) actualSizeInfo.textContent = `${canvasSize}×${canvasSize}`;
+
+    // Detail panel
+    const detailCharScale = document.getElementById('detailCharScale');
+    const detailPixelScale = document.getElementById('detailPixelScale');
+    const detailCellPixelSize = document.getElementById('detailCellPixelSize');
+    if (detailCharScale) detailCharScale.textContent = `${CONFIG.characterScale}×`;
+    if (detailPixelScale) detailPixelScale.textContent = `${CONFIG.pixelScale}×`;
+    if (detailCellPixelSize) detailCellPixelSize.textContent = `${cellPixelSize}×${cellPixelSize}`;
+}
+
+/**
+ * Re-render the atlas with current CONFIG
+ */
+function render() {
+    updateInfoPanel();
+    renderActualSize();
+    renderDetail();
+}
+
+/**
+ * Render the actual size atlas with pixel scaling
+ */
+function renderActualSize() {
+    if (!actualSizeCanvas || !actualSizeCtx) return;
+
+    const atlasSize = ATLAS_SIZE * CONFIG.characterScale;
+    const canvasSize = atlasSize * CONFIG.pixelScale;
+
+    // Set canvas to scaled pixel size
+    actualSizeCanvas.width = canvasSize;
+    actualSizeCanvas.height = canvasSize;
+    actualSizeCanvas.style.width = canvasSize + 'px';
+    actualSizeCanvas.style.height = canvasSize + 'px';
+
+    // Disable image smoothing for crisp pixels
+    actualSizeCtx.imageSmoothingEnabled = false;
+
+    // Render using current renderer
+    currentRenderer.renderAtlas(actualSizeCtx, canvasSize, CONFIG);
+}
+
+/**
+ * Render the detail view of a single character
+ */
+function renderDetail() {
+    if (!detailCanvas || !detailCtx) return;
+
+    const cellSize = BASE_CELL_SIZE * CONFIG.characterScale;
+    const cellPixelSize = cellSize * CONFIG.pixelScale;
+    const displaySize = cellPixelSize * CONFIG.detailMagnification;
+
+    // Update canvas size based on cell pixel size (display units × pixel scale)
+    detailCanvas.width = cellPixelSize;
+    detailCanvas.height = cellPixelSize;
+    detailCanvas.style.width = displaySize + 'px';
+    detailCanvas.style.height = displaySize + 'px';
+
+    // Disable image smoothing
+    detailCtx.imageSmoothingEnabled = false;
+
+    // Render using current renderer
+    currentRenderer.renderCharacter(detailCtx, CONFIG.detailChar, cellPixelSize, CONFIG);
+
+    // Show note if origin is at fractional pixel position
+    const originNote = document.getElementById('originNote');
+    if (CONFIG.showOrigin) {
+        const offsetX = CONFIG.originOffsetX * CONFIG.characterScale * CONFIG.pixelScale;
+        const offsetY = CONFIG.originOffsetY * CONFIG.characterScale * CONFIG.pixelScale;
+        const isFractional = !Number.isInteger(offsetX) || !Number.isInteger(offsetY);
+        if (originNote) originNote.style.display = isFractional ? 'block' : 'none';
+    } else {
+        if (originNote) originNote.style.display = 'none';
+    }
+
+    // Update ROM table, vector output, and simplified vector
+    const romBody = document.getElementById('romTableBody');
+    const vectorBody = document.getElementById('vectorTableBody');
+    const simplifiedBody = document.getElementById('simplifiedTableBody');
+    if (romBody) updateRomTable(CONFIG.detailChar, romBody);
+    if (vectorBody) updateVectorTable(CONFIG.detailChar, vectorBody);
+    if (simplifiedBody) updateSimplifiedTable(CONFIG.detailChar, simplifiedBody);
+}
+
+/**
+ * Download canvas as PNG file
+ */
+function downloadPNG() {
+    if (!actualSizeCanvas) return;
+
+    const link = document.createElement('a');
+    link.download = 'dd60-atlas.png';
+    link.href = actualSizeCanvas.toDataURL('image/png');
+    link.click();
+}
+
+/**
+ * Switch to a different renderer
+ * @param {string} mode - Renderer mode ('font', 'vector', 'crt')
+ */
+function switchRenderer(mode) {
+    const renderer = RENDERERS[mode];
+    if (renderer) {
+        currentRenderer = renderer;
+        CONFIG.renderMode = /** @type {'font'|'vector'|'crt'} */ (mode);
+        updateControlStates(currentRenderer.supportedControls);
+        render();
+    } else {
+        // Renderer not yet implemented - show alert and revert dropdown
+        alert(`${mode} renderer not yet implemented`);
+        const select = /** @type {HTMLSelectElement} */ (document.getElementById('renderMode'));
+        if (select) {
+            select.value = CONFIG.renderMode;
+        }
+    }
+}
+
+/**
+ * Setup event listeners
+ */
+function setupEventListeners() {
+    const downloadBtn = document.getElementById('downloadBtn');
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', downloadPNG);
+    }
+
+    // Bind renderer mode dropdown (special handling - not in CONTROL_BINDINGS)
+    const renderModeSelect = /** @type {HTMLSelectElement} */ (document.getElementById('renderMode'));
+    if (renderModeSelect) {
+        renderModeSelect.addEventListener('change', () => {
+            switchRenderer(renderModeSelect.value);
+        });
+    }
+
+    // Bind all controls (including detailChar and detailMag)
+    bindControls(CONFIG, render);
+}
+
+/**
+ * Check if browser is Chrome and show warning if not
+ */
+function checkBrowser() {
+    const isChrome = /Chrome/.test(navigator.userAgent) && !/Edg/.test(navigator.userAgent);
+    if (!isChrome) {
+        const warning = document.getElementById('browserWarning');
+        if (warning) {
+            warning.style.display = 'block';
+        }
+    }
+}
+
+// Initialize on DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+    checkBrowser();
+    init();
+    setupEventListeners();
+});
+    </script>
+</body>
+</html>

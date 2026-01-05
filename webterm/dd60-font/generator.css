@@ -1,0 +1,268 @@
+/**
+ * DD60 Font Atlas Generator Styles
+ */
+
+body {
+    font-family: system-ui, sans-serif;
+    background: #1a1a1a;
+    color: #e0e0e0;
+    margin: 20px;
+}
+
+h1 {
+    color: #90EE90;
+}
+
+h1 .version {
+    font-size: 0.5em;
+    color: #666;
+    font-weight: normal;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.canvas-wrapper {
+    border: 1px solid #444;
+    background: #000;
+    display: inline-block;
+}
+
+.info {
+    padding: 10px;
+    background: #2a2a2a;
+    border-radius: 4px;
+}
+
+.info-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding-top: 10px;
+    border-top: 1px solid #444;
+    margin-top: 10px;
+}
+
+.label {
+    color: #888;
+}
+
+button {
+    background: #4a4a4a;
+    color: #e0e0e0;
+    border: 1px solid #666;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+button:hover {
+    background: #5a5a5a;
+}
+
+.controls {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+    padding-top: 10px;
+    border-top: 1px solid #444;
+}
+
+.control-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.control-row label {
+    color: #888;
+    width: 160px;
+    flex-shrink: 0;
+    position: relative;
+    cursor: help;
+}
+
+.control-row label[data-tooltip]:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 0;
+    top: 100%;
+    margin-top: 6px;
+    background: #444;
+    color: #e0e0e0;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    white-space: normal;
+    width: 280px;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    border: 1px solid #555;
+    line-height: 1.4;
+}
+
+.control-row input[type="range"] {
+    width: 640px;
+}
+
+.control-row input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+}
+
+.value-display {
+    min-width: 40px;
+    text-align: right;
+    color: #90EE90;
+}
+
+.control-row.disabled {
+    opacity: 0.4;
+}
+
+.control-row.disabled input,
+.control-row.disabled select {
+    cursor: not-allowed;
+}
+
+.detail-panel {
+    margin-top: 20px;
+    padding: 10px;
+    background: #2a2a2a;
+    border-radius: 4px;
+}
+
+.detail-panel h2 {
+    color: #90EE90;
+    margin: 0 0 10px 0;
+    font-size: 1.2em;
+}
+
+.detail-controls {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.controls select,
+.detail-controls select {
+    background: #333;
+    border: 1px solid #555;
+    color: #e0e0e0;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 14px;
+}
+
+.detail-canvas-wrapper {
+    border: 1px solid #444;
+    background: #000;
+    display: inline-block;
+}
+
+#detailCanvas {
+    display: block;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: pixelated;
+}
+
+#actualSizeCanvas {
+    display: block;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: pixelated;
+}
+
+.actual-size-panel {
+    margin-top: 20px;
+    padding: 10px;
+    background: #2a2a2a;
+    border-radius: 4px;
+}
+
+.actual-size-panel h2 {
+    color: #90EE90;
+    margin: 0 0 10px 0;
+    font-size: 1.2em;
+}
+
+.browser-warning {
+    background: #553300;
+    border: 1px solid #aa6600;
+    color: #ffcc00;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    display: none;
+}
+
+.origin-note {
+    color: #888;
+    font-size: 12px;
+    font-style: italic;
+}
+
+.detail-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.tables-row {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.rom-table-wrapper {
+    background: #1a1a1a;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.rom-table-wrapper h3 {
+    color: #90EE90;
+    margin: 0 0 8px 0;
+    font-size: 1em;
+}
+
+.rom-table {
+    border-collapse: collapse;
+    font-family: monospace;
+    font-size: 12px;
+}
+
+.rom-table th,
+.rom-table td {
+    border: 1px solid #444;
+    padding: 2px 6px;
+    text-align: center;
+    min-width: 20px;
+}
+
+.rom-table th {
+    background: #333;
+    color: #90EE90;
+}
+
+.rom-table td {
+    background: #222;
+    color: #e0e0e0;
+}
+
+.rom-table td.set {
+    color: #90EE90;
+    font-weight: bold;
+}
+
+.rom-table .t-col {
+    background: #2a2a2a;
+    color: #888;
+}
