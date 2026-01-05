@@ -344,3 +344,5 @@ for (const [x, y, intensity] of triplets) {
 - **INTEGRATION.md** - Atlas integration guide for DtCyber implementations
 - **generator.html** - Font atlas generator with preview UI
 - `webterm/www/js/console.js` - Runtime console for integration (DtCyber repo)
+
+---

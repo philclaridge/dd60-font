@@ -8,6 +8,7 @@
 </head>
 <body>
     <h1>DD60 Font Atlas Generator <span class="version">v1.2</span></h1>
+    <div class="subtitle"><a href="https://github.com/philclaridge/dd60-font">github.com/philclaridge/dd60-font</a></div>
 
     <div id="browserWarning" class="browser-warning">
         Warning: This application has only been tested in Chrome. Some features may not work correctly in other browsers.
@@ -19,8 +20,8 @@
                 <div class="control-row">
                     <label for="renderMode" data-tooltip="Font: System font rendering. Character ROM: Vector strokes from CDC ROM data. ROM + Physics: Spot-based beam simulation. ROM + Gaussian: Gaussian spot for realistic phosphor glow.">Render Mode</label>
                     <select id="renderMode">
-                        <option value="vector">DD60 ROM + Vector Strokes (best for smallest fonts)</option>
                         <option value="gaussian" selected>DD60 ROM + Physics + Gaussian Spot (hi fidelity)</option>
+                        <option value="vector">DD60 ROM + Vector Strokes (best for smallest fonts)</option>
                         <option value="crt">DD60 ROM + Physics + Solid Spot (stroke path debugging)</option>
                         <option value="font">System Font - Lucida Typewriter (layout framework debugging)</option>
                     </select>
@@ -501,6 +502,8 @@ document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
 });
     </script>
-    <footer style="margin-top: 20px; color: #666; font-size: 12px;">© 2025 Phil Claridge</footer>
+    <footer style="margin-top: 20px; color: #666; font-size: 12px;">
+© 2025 Phil Claridge, with contributions from Claude Code (Opus 4.5)
+    </footer>
 </body>
 </html>

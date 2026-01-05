@@ -12,10 +12,10 @@ Browser-based font atlas generator emulating the vector CRT display of the CDC 6
 
 | Mode | Description |
 |------|-------------|
-| **Font** | System font rendering |
-| **Character ROM** | Vector strokes from authentic CDC 6602 ROM data |
-| **ROM + Physics** | CRT beam simulation with analog filter effects |
-| **ROM + Gaussian** | Physics simulation with Gaussian spot for realistic phosphor glow |
+| **ROM + Gaussian Spot** | Physics simulation with Gaussian spot (highest fidelity) |
+| **ROM + Vector Strokes** | Authentic CDC 6602 ROM data (best for smallest fonts) |
+| **ROM + Solid Spot** | Physics simulation with solid spot (stroke path debugging) |
+| **System Font** | Lucida Typewriter via fillText (layout framework debugging) |
 
 ## Usage
 
@@ -29,4 +29,4 @@ The generator can be used to create offline font atlas textures (PNG files) for 
 - [INTEGRATION.md](webterm/dd60-font/INTEGRATION.md) - Atlas integration guide
 
 ---
-© 2025 Phil Claridge
+© 2025 Phil Claridge, with contributions from Claude Code (Opus 4.5)

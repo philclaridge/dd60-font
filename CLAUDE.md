@@ -28,15 +28,16 @@ DD60 Font Atlas Generator - a browser-based tool for generating bitmap font atla
 
 ### Renderer System (`renderers/`)
 
-Three rendering modes implemented as separate modules conforming to `types.js` interface:
+Four rendering modes implemented as separate modules conforming to `types.js` interface:
 
 | Mode | File | Description |
 |------|------|-------------|
 | Font | `fontMode.js` | System font via `fillText()` |
 | Character ROM | `vectorMode.js` | Fixed-width strokes from CDC ROM vectors |
-| ROM + Physics | `crtMode.js` | Beam physics simulation with IIR/biquad filters |
+| ROM + Physics | `crtMode.js` | Beam physics simulation with solid spot rendering |
+| ROM + Gaussian | `gaussianMode.js` | Physics simulation with Gaussian spot and float accumulation |
 
-Each renderer exports `renderAtlas()`, `renderCharacter()`, and `supportedControls`.
+Shared physics code in `physics.js`. Each renderer exports `renderAtlas()`, `renderCharacter()`, and `supportedControls`.
 
 ### ROM Data (`rom/`)
 

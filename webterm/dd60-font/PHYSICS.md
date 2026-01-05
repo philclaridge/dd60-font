@@ -291,3 +291,5 @@ Could be modeled as post-process Gaussian convolution applied after accumulation
 2. Compare character shapes to reference photographs of actual DD60 display
 3. Iterate on filter coefficients and spot parameters
 4. Document final parameter set that best matches original hardware
+
+---

@@ -19,6 +19,20 @@ h1 .version {
     font-weight: normal;
 }
 
+.subtitle {
+    margin-top: -10px;
+    margin-bottom: 15px;
+}
+
+.subtitle a {
+    color: #888;
+    text-decoration: none;
+}
+
+.subtitle a:hover {
+    color: #90EE90;
+}
+
 .container {
     display: flex;
     flex-direction: column;
