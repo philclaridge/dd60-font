@@ -15,6 +15,11 @@ Browser-based font atlas generator emulating the vector CRT display of the CDC 6
 | **Font** | System font rendering |
 | **Character ROM** | Vector strokes from authentic CDC 6602 ROM data |
 | **ROM + Physics** | CRT beam simulation with analog filter effects |
+| **ROM + Gaussian** | Physics simulation with Gaussian spot for realistic phosphor glow |
+
+## Usage
+
+The generator can be used to create offline font atlas textures (PNG files) for use in emulators or games. Since the rendering code is JavaScript, it could also be integrated directly into a display application to regenerate textures in real-time, allowing users to adjust brightness, focus, and other CRT parameters dynamically.
 
 ## Documentation
 

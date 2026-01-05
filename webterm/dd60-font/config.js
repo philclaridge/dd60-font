@@ -20,8 +20,8 @@ export const ATLAS_SIZE = GRID_CELLS * BASE_CELL_SIZE;
  * @type {Object}
  */
 export const DEFAULT_CONFIG = {
-    /** @type {'font'|'vector'|'crt'} Renderer mode */
-    renderMode: 'crt',
+    /** @type {'font'|'vector'|'crt'|'gaussian'} Renderer mode */
+    renderMode: 'gaussian',
     /** @type {number} Character scale multiplier (1, 2, or 4) */
     characterScale: 1,
     /** @type {number} Pixel scale multiplier (1 to 16) */
@@ -35,17 +35,17 @@ export const DEFAULT_CONFIG = {
     /** @type {boolean} Show character origin dots */
     showOrigin: false,
     /** @type {number} Beam width in pixels (spot radius) */
-    beamWidth: 1.5,
+    beamWidth: 8,
     /** @type {number} Brightness multiplier */
-    brightness: 1.0,
+    brightness: 0.5,
     /** @type {string} Canvas blend mode for spot rendering */
     blendMode: 'source-over',
     /** @type {number} X/Y deflection biquad filter cutoff (fraction of sample rate) */
-    filterCutoff: 0.02,
+    filterCutoff: 0.003,
     /** @type {number} X/Y deflection biquad filter Q factor (0.707 = Butterworth) */
-    filterQ: 0.707,
+    filterQ: 0.75,
     /** @type {number} Z beam intensity IIR filter retention (0 = no filter, 0.99 = heavy) */
-    filterZ: 0,
+    filterZ: 0.975,
     /** @type {string} Foreground color (phosphor green) */
     fgColor: '#90EE90',
     /** @type {string} Background color */

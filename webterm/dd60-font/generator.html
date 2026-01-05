@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DD60 Font Atlas Generator v1.1</title>
+    <title>DD60 Font Atlas Generator v1.2</title>
     <link rel="stylesheet" href="generator.css">
 </head>
 <body>
-    <h1>DD60 Font Atlas Generator <span class="version">v1.1</span></h1>
+    <h1>DD60 Font Atlas Generator <span class="version">v1.2</span></h1>
 
     <div id="browserWarning" class="browser-warning">
         Warning: This application has only been tested in Chrome. Some features may not work correctly in other browsers.
@@ -17,11 +17,12 @@
         <div class="info">
             <div class="controls">
                 <div class="control-row">
-                    <label for="renderMode" data-tooltip="Font: System font rendering. Character ROM: Vector strokes from CDC ROM data. ROM + Physics: CRT beam simulation with analog filter effects.">Render Mode</label>
+                    <label for="renderMode" data-tooltip="Font: System font rendering. Character ROM: Vector strokes from CDC ROM data. ROM + Physics: Spot-based beam simulation. ROM + Gaussian: Gaussian spot for realistic phosphor glow.">Render Mode</label>
                     <select id="renderMode">
-                        <option value="font">Font</option>
-                        <option value="vector">Character ROM</option>
-                        <option value="crt" selected>ROM + Physics</option>
+                        <option value="vector">DD60 ROM + Vector Strokes (best for smallest fonts)</option>
+                        <option value="gaussian" selected>DD60 ROM + Physics + Gaussian Spot (hi fidelity)</option>
+                        <option value="crt">DD60 ROM + Physics + Solid Spot (stroke path debugging)</option>
+                        <option value="font">System Font - Lucida Typewriter (layout framework debugging)</option>
                     </select>
                 </div>
 
@@ -54,31 +55,31 @@
 
                 <div class="control-row">
                     <label for="filterCutoff" data-tooltip="Biquad low-pass filter cutoff frequency (fraction of sample rate). Lower values produce more corner rounding and slower response. Simulates deflection amplifier bandwidth.">X/Y Filter Cutoff</label>
-                    <input type="range" id="filterCutoff" min="0" max="1" step="0.002" value="0.5">
+                    <input type="range" id="filterCutoff" min="0" max="1" step="0.002" value="0.003">
                     <span class="value-display" id="filterCutoffValue">0.080</span>
                 </div>
 
                 <div class="control-row">
                     <label for="filterQ" data-tooltip="Biquad filter resonance. 0.707 = Butterworth (no overshoot). Higher values add overshoot at corners. Lower values produce sluggish, overdamped response.">X/Y Q Factor</label>
-                    <input type="range" id="filterQ" min="0.3" max="2.0" step="0.01" value="0.707">
+                    <input type="range" id="filterQ" min="0.3" max="2.0" step="0.01" value="0.75">
                     <span class="value-display" id="filterQValue">0.71</span>
                 </div>
 
                 <div class="control-row">
-                    <label for="filterZ" data-tooltip="Beam intensity filter retention. 0 = instant on/off. Higher values create soft stroke endpoints as beam fades in/out gradually.">Z Filter Retention</label>
-                    <input type="range" id="filterZ" min="0" max="0.99" step="0.01" value="0">
+                    <label for="filterZ" data-tooltip="Beam intensity filter retention. 0 = instant on/off. Higher values create soft stroke endpoints as beam fades in/out gradually.">Beam On/Off Filter</label>
+                    <input type="range" id="filterZ" min="0" max="0.99" step="0.001" value="0.975">
                     <span class="value-display" id="filterZValue">0</span>
                 </div>
 
                 <div class="control-row">
                     <label for="brightness" data-tooltip="Spot intensity multiplier. Higher values produce brighter traces. Values above 1.0 may cause saturation (clipping to white in additive mode).">Brightness</label>
-                    <input type="range" id="brightness" min="0" max="3.0" step="0.01" value="1.0">
+                    <input type="range" id="brightness" min="0" max="1.5" step="0.01" value="0.5">
                     <span class="value-display" id="brightnessValue">1.0</span>
                 </div>
 
                 <div class="control-row">
-                    <label for="beamWidth" data-tooltip="Spot radius in pixels. Simulates CRT beam focus. Larger values produce softer, more diffuse traces.">Beam Width</label>
-                    <input type="range" id="beamWidth" min="0.2" max="10" step="0.1" value="1.5">
+                    <label for="beamWidth" id="beamWidthLabel" data-tooltip="Spot radius in pixels. Simulates CRT beam focus. Larger values produce softer, more diffuse traces.">Beam Width</label>
+                    <input type="range" id="beamWidth" min="0.2" max="20" step="0.1" value="8">
                     <span class="value-display" id="beamWidthValue">1.5</span>
                 </div>
 
@@ -100,7 +101,10 @@
                     <input type="checkbox" id="showOrigin">
                 </div>
 
-                <button id="downloadBtn">Download PNG</button>
+                <div style="display: flex; gap: 8px;">
+                    <button id="downloadBtn">Download <span id="downloadFilename">dd60-gaussian-c1-p16.png</span></button>
+                    <button id="resetBtn" onclick="location.reload()">Reset Settings</button>
+                </div>
             </div>
 
             <div class="info-panel">
@@ -212,6 +216,7 @@ import { bindControls, updateControlStates } from './controlBinder.js';
 import { fontModeRenderer } from './renderers/fontMode.js';
 import { vectorModeRenderer } from './renderers/vectorMode.js';
 import { crtModeRenderer } from './renderers/crtMode.js';
+import { gaussianModeRenderer } from './renderers/gaussianMode.js';
 
 /**
  * DD60 Font Atlas Generator
@@ -231,6 +236,7 @@ const RENDERERS = {
     font: fontModeRenderer,
     vector: vectorModeRenderer,
     crt: crtModeRenderer,
+    gaussian: gaussianModeRenderer,
 };
 
 /** @type {import('./renderers/types.js').Renderer} */
@@ -269,6 +275,12 @@ function init() {
 
     // Set initial control states based on renderer
     updateControlStates(currentRenderer.supportedControls);
+
+    // Set initial beam label based on default mode
+    const beamLabel = document.getElementById('beamWidthLabel');
+    if (beamLabel) {
+        beamLabel.textContent = CONFIG.renderMode === 'gaussian' ? 'Beam Focus' : 'Beam Width';
+    }
 
     render();
 }
@@ -321,6 +333,10 @@ function updateInfoPanel() {
     // Actual size panel
     const actualSizeInfo = document.getElementById('actualSizeInfo');
     if (actualSizeInfo) actualSizeInfo.textContent = `${canvasSize}×${canvasSize}`;
+
+    // Download filename
+    const downloadFilename = document.getElementById('downloadFilename');
+    if (downloadFilename) downloadFilename.textContent = `dd60-${CONFIG.renderMode}-c${CONFIG.characterScale}-p${CONFIG.pixelScale}.png`;
 
     // Detail panel
     const detailCharScale = document.getElementById('detailCharScale');
@@ -411,21 +427,28 @@ function downloadPNG() {
     if (!actualSizeCanvas) return;
 
     const link = document.createElement('a');
-    link.download = 'dd60-atlas.png';
+    link.download = `dd60-${CONFIG.renderMode}-c${CONFIG.characterScale}-p${CONFIG.pixelScale}.png`;
     link.href = actualSizeCanvas.toDataURL('image/png');
     link.click();
 }
 
 /**
  * Switch to a different renderer
- * @param {string} mode - Renderer mode ('font', 'vector', 'crt')
+ * @param {string} mode - Renderer mode ('font', 'vector', 'crt', 'gaussian')
  */
 function switchRenderer(mode) {
     const renderer = RENDERERS[mode];
     if (renderer) {
         currentRenderer = renderer;
-        CONFIG.renderMode = /** @type {'font'|'vector'|'crt'} */ (mode);
+        CONFIG.renderMode = /** @type {'font'|'vector'|'crt'|'gaussian'} */ (mode);
         updateControlStates(currentRenderer.supportedControls);
+
+        // Update beam width/focus label based on mode
+        const beamLabel = document.getElementById('beamWidthLabel');
+        if (beamLabel) {
+            beamLabel.textContent = mode === 'gaussian' ? 'Beam Focus' : 'Beam Width';
+        }
+
         render();
     } else {
         // Renderer not yet implemented - show alert and revert dropdown

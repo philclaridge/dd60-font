@@ -38,7 +38,12 @@ export function drawOriginMarker(ctx, cellX, cellY, cellSize, offsetX, offsetY, 
     // Canvas y increases downward, so bottom = cellY + cellSize - 1
     const x = cellX + offsetX;
     const y = cellY + cellSize - 1 - offsetY;
-    ctx.fillRect(x, y, 1, 1);
+    // Draw 3x3 cross pattern
+    ctx.fillRect(x, y, 1, 1);      // center
+    ctx.fillRect(x - 1, y, 1, 1);  // left
+    ctx.fillRect(x + 1, y, 1, 1);  // right
+    ctx.fillRect(x, y - 1, 1, 1);  // top
+    ctx.fillRect(x, y + 1, 1, 1);  // bottom
 }
 
 /**
