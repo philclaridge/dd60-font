@@ -2,6 +2,11 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Git Workflow
+
+- Only push when explicitly asked
+- Before pushing, ask if interactive rebase is desired to squash commits
+
 ## Project Overview
 
 DD60 Font Atlas Generator - a browser-based tool for generating bitmap font atlases that emulate the visual characteristics of the CDC 6600's DD60 vector CRT display. The project simulates analog CRT effects including beam physics, deflection filter response, and phosphor characteristics.

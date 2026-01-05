@@ -22,3 +22,6 @@ Browser-based font atlas generator emulating the vector CRT display of the CDC 6
 - [DD60.md](webterm/dd60-font/DD60.md) - Hardware specifications and research
 - [PHYSICS.md](webterm/dd60-font/PHYSICS.md) - CRT physics emulation design
 - [INTEGRATION.md](webterm/dd60-font/INTEGRATION.md) - Atlas integration guide
+
+---
+© 2025 Phil Claridge
