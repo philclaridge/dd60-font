@@ -54,52 +54,74 @@
                     </select>
                 </div>
 
+                <div class="checkbox-row">
+                    <label class="checkbox-item" data-tooltip="When enabled, changing X parameters will also update Y parameters and vice versa.">
+                        <input type="checkbox" id="syncXY" checked> Sync X/Y
+                    </label>
+                    <label class="checkbox-item" data-tooltip="Overlay checkerboard pattern showing cell boundaries.">
+                        <input type="checkbox" id="showGrid"> Show Checkerboard
+                    </label>
+                    <label class="checkbox-item" data-tooltip="Show character origin markers.">
+                        <input type="checkbox" id="showOrigin"> Show Origin
+                    </label>
+                </div>
+
+                <h3 class="control-subheader">Deflection</h3>
+
                 <div class="control-row">
-                    <label for="filterCutoff" data-tooltip="Biquad low-pass filter cutoff frequency (fraction of sample rate). Lower values produce more corner rounding and slower response. Simulates deflection amplifier bandwidth.">X/Y Filter Cutoff</label>
-                    <input type="range" id="filterCutoff" min="0" max="1" step="0.002" value="0.003">
-                    <span class="value-display" id="filterCutoffValue">0.080</span>
+                    <label for="filterCutoffX" data-tooltip="X deflection biquad low-pass filter cutoff frequency. Lower values = more rounding.">X Filter Cutoff</label>
+                    <input type="range" id="filterCutoffX" min="0" max="1" step="0.002" value="0.5">
+                    <span class="value-display" id="filterCutoffXValue">0.003</span>
                 </div>
 
                 <div class="control-row">
-                    <label for="filterQ" data-tooltip="Biquad filter resonance. 0.707 = Butterworth (no overshoot). Higher values add overshoot at corners. Lower values produce sluggish, overdamped response.">X/Y Q Factor</label>
-                    <input type="range" id="filterQ" min="0.3" max="2.0" step="0.01" value="0.75">
-                    <span class="value-display" id="filterQValue">0.71</span>
+                    <label for="filterQX" data-tooltip="X deflection Q factor. 0.707 = Butterworth. Higher = overshoot, lower = overdamped.">X Q Factor</label>
+                    <input type="range" id="filterQX" min="0.3" max="2.0" step="0.01" value="0.75">
+                    <span class="value-display" id="filterQXValue">0.75</span>
                 </div>
 
                 <div class="control-row">
-                    <label for="filterZ" data-tooltip="Beam intensity filter retention. 0 = instant on/off. Higher values create soft stroke endpoints as beam fades in/out gradually.">Beam On/Off Filter</label>
-                    <input type="range" id="filterZ" min="0" max="0.99" step="0.001" value="0.975">
-                    <span class="value-display" id="filterZValue">0</span>
+                    <label for="filterGainX" data-tooltip="X deflection gain multiplier. Values &lt; 1 shrink horizontally.">X Gain</label>
+                    <input type="range" id="filterGainX" min="0.4" max="1.2" step="0.01" value="1.0">
+                    <span class="value-display" id="filterGainXValue">1.0</span>
                 </div>
 
+                <div class="control-row y-control">
+                    <label for="filterCutoffY" data-tooltip="Y deflection biquad low-pass filter cutoff frequency. Lower values = more rounding.">Y Filter Cutoff</label>
+                    <input type="range" id="filterCutoffY" min="0" max="1" step="0.002" value="0.5">
+                    <span class="value-display" id="filterCutoffYValue">0.003</span>
+                </div>
+
+                <div class="control-row y-control">
+                    <label for="filterQY" data-tooltip="Y deflection Q factor. 0.707 = Butterworth. Higher = overshoot, lower = overdamped.">Y Q Factor</label>
+                    <input type="range" id="filterQY" min="0.3" max="2.0" step="0.01" value="0.75">
+                    <span class="value-display" id="filterQYValue">0.75</span>
+                </div>
+
+                <div class="control-row y-control">
+                    <label for="filterGainY" data-tooltip="Y deflection gain multiplier. Values &lt; 1 shrink vertically.">Y Gain</label>
+                    <input type="range" id="filterGainY" min="0.4" max="1.2" step="0.01" value="1.0">
+                    <span class="value-display" id="filterGainYValue">1.0</span>
+                </div>
+
+                <h3 class="control-subheader">Beam</h3>
+
                 <div class="control-row">
-                    <label for="brightness" data-tooltip="Spot intensity multiplier. Higher values produce brighter traces. Values above 1.0 may cause saturation (clipping to white in additive mode).">Brightness</label>
+                    <label for="brightness" data-tooltip="Spot intensity multiplier. Higher values produce brighter traces.">Brightness</label>
                     <input type="range" id="brightness" min="0" max="1.5" step="0.01" value="0.5">
                     <span class="value-display" id="brightnessValue">1.0</span>
                 </div>
 
                 <div class="control-row">
-                    <label for="beamWidth" id="beamWidthLabel" data-tooltip="Spot radius in pixels. Simulates CRT beam focus. Larger values produce softer, more diffuse traces.">Beam Width</label>
+                    <label for="beamWidth" id="beamWidthLabel" data-tooltip="Spot radius in pixels. Larger values produce softer, more diffuse traces.">Focus</label>
                     <input type="range" id="beamWidth" min="0.2" max="20" step="0.1" value="8">
                     <span class="value-display" id="beamWidthValue">1.5</span>
                 </div>
 
                 <div class="control-row">
-                    <label for="blendMode" data-tooltip="Normal: Each spot replaces pixels. Additive: Spots accumulate brightness, simulating phosphor excitation. Produces white at high intensity (saturation).">Blend Mode</label>
-                    <select id="blendMode">
-                        <option value="source-over" selected>Normal</option>
-                        <option value="lighter">Additive</option>
-                    </select>
-                </div>
-
-                <div class="control-row">
-                    <label for="showGrid" data-tooltip="Overlay checkerboard pattern showing cell boundaries. Useful for verifying pixel alignment.">Show Checkerboard</label>
-                    <input type="checkbox" id="showGrid">
-                </div>
-
-                <div class="control-row">
-                    <label for="showOrigin" data-tooltip="Show character origin markers. Origin (0,0) is offset from cell corner to allow margin for beam effects.">Show Origin</label>
-                    <input type="checkbox" id="showOrigin">
+                    <label for="filterZ" data-tooltip="Intensity filter retention. 0 = instant on/off. Higher values create soft stroke endpoints as beam fades in/out gradually.">On/Off Delay</label>
+                    <input type="range" id="filterZ" min="0" max="0.99" step="0.001" value="0.975">
+                    <span class="value-display" id="filterZValue">0</span>
                 </div>
 
                 <div style="display: flex; gap: 8px;">
@@ -277,12 +299,6 @@ function init() {
     // Set initial control states based on renderer
     updateControlStates(currentRenderer.supportedControls);
 
-    // Set initial beam label based on default mode
-    const beamLabel = document.getElementById('beamWidthLabel');
-    if (beamLabel) {
-        beamLabel.textContent = CONFIG.renderMode === 'gaussian' ? 'Beam Focus' : 'Beam Width';
-    }
-
     render();
 }
 
@@ -443,13 +459,6 @@ function switchRenderer(mode) {
         currentRenderer = renderer;
         CONFIG.renderMode = /** @type {'font'|'vector'|'crt'|'gaussian'} */ (mode);
         updateControlStates(currentRenderer.supportedControls);
-
-        // Update beam width/focus label based on mode
-        const beamLabel = document.getElementById('beamWidthLabel');
-        if (beamLabel) {
-            beamLabel.textContent = mode === 'gaussian' ? 'Beam Focus' : 'Beam Width';
-        }
-
         render();
     } else {
         // Renderer not yet implemented - show alert and revert dropdown
@@ -480,6 +489,92 @@ function setupEventListeners() {
 
     // Bind all controls (including detailChar and detailMag)
     bindControls(CONFIG, render);
+
+    // Setup X/Y sync functionality
+    setupXYSync();
+}
+
+/**
+ * Setup X/Y parameter synchronization
+ * When syncXY checkbox is checked, changing X updates Y and vice versa
+ */
+function setupXYSync() {
+    const syncCheckbox = /** @type {HTMLInputElement} */ (document.getElementById('syncXY'));
+    if (!syncCheckbox) return;
+
+    // Define X/Y pairs: [xId, yId, xConfigProp, yConfigProp]
+    const pairs = [
+        ['filterCutoffX', 'filterCutoffY', 'filterCutoffX', 'filterCutoffY'],
+        ['filterQX', 'filterQY', 'filterQX', 'filterQY'],
+        ['filterGainX', 'filterGainY', 'filterGainX', 'filterGainY']
+    ];
+
+    // Update Y control visual state based on sync checkbox
+    function updateYControlsState() {
+        const yControls = document.querySelectorAll('.y-control');
+        yControls.forEach(el => {
+            el.classList.toggle('synced', syncCheckbox.checked);
+        });
+    }
+
+    // Set initial state
+    updateYControlsState();
+
+    // When sync checkbox is checked, copy X values to Y and grey out Y controls
+    syncCheckbox.addEventListener('change', () => {
+        updateYControlsState();
+        if (syncCheckbox.checked) {
+            for (const [xId, yId, xProp, yProp] of pairs) {
+                const xEl = /** @type {HTMLInputElement} */ (document.getElementById(xId));
+                const yEl = /** @type {HTMLInputElement} */ (document.getElementById(yId));
+                const xDisplay = document.getElementById(xId + 'Value');
+                const yDisplay = document.getElementById(yId + 'Value');
+
+                if (xEl && yEl) {
+                    yEl.value = xEl.value;
+                    // @ts-ignore
+                    CONFIG[yProp] = CONFIG[xProp];
+                    if (yDisplay && xDisplay) {
+                        yDisplay.textContent = xDisplay.textContent;
+                    }
+                }
+            }
+            render();
+        }
+    });
+
+    for (const [xId, yId, xProp, yProp] of pairs) {
+        const xEl = /** @type {HTMLInputElement} */ (document.getElementById(xId));
+        const yEl = /** @type {HTMLInputElement} */ (document.getElementById(yId));
+        const xDisplay = document.getElementById(xId + 'Value');
+        const yDisplay = document.getElementById(yId + 'Value');
+
+        if (!xEl || !yEl) continue;
+
+        // When X changes, update Y if synced
+        xEl.addEventListener('input', () => {
+            if (syncCheckbox.checked) {
+                yEl.value = xEl.value;
+                // @ts-ignore
+                CONFIG[yProp] = CONFIG[xProp];
+                if (yDisplay && xDisplay) {
+                    yDisplay.textContent = xDisplay.textContent;
+                }
+            }
+        });
+
+        // When Y changes, update X if synced
+        yEl.addEventListener('input', () => {
+            if (syncCheckbox.checked) {
+                xEl.value = yEl.value;
+                // @ts-ignore
+                CONFIG[xProp] = CONFIG[yProp];
+                if (xDisplay && yDisplay) {
+                    xDisplay.textContent = yDisplay.textContent;
+                }
+            }
+        });
+    }
 }
 
 /**

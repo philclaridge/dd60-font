@@ -16,8 +16,12 @@
  * @property {boolean} showOrigin - Show origin markers
  * @property {number} beamWidth - Beam width multiplier
  * @property {number} brightness - Brightness multiplier
- * @property {number} filterCutoff - X/Y biquad filter cutoff (fraction of sample rate)
- * @property {number} filterQ - X/Y biquad filter Q factor (0.3-2.0)
+ * @property {number} filterCutoffX - X deflection biquad filter cutoff (fraction of sample rate)
+ * @property {number} filterCutoffY - Y deflection biquad filter cutoff (fraction of sample rate)
+ * @property {number} filterQX - X deflection biquad filter Q factor (0.3-2.0)
+ * @property {number} filterQY - Y deflection biquad filter Q factor (0.3-2.0)
+ * @property {number} filterGainX - X deflection gain multiplier
+ * @property {number} filterGainY - Y deflection gain multiplier
  * @property {number} filterZ - Z beam IIR filter retention (0-0.99)
  * @property {string} blendMode - Canvas composite operation for spot rendering
  * @property {string} fgColor - Foreground color

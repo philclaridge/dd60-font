@@ -40,10 +40,18 @@ export const DEFAULT_CONFIG = {
     brightness: 0.5,
     /** @type {string} Canvas blend mode for spot rendering */
     blendMode: 'source-over',
-    /** @type {number} X/Y deflection biquad filter cutoff (fraction of sample rate) */
-    filterCutoff: 0.003,
-    /** @type {number} X/Y deflection biquad filter Q factor (0.707 = Butterworth) */
-    filterQ: 0.75,
+    /** @type {number} X deflection biquad filter cutoff (fraction of sample rate) */
+    filterCutoffX: 0.003,
+    /** @type {number} Y deflection biquad filter cutoff (fraction of sample rate) */
+    filterCutoffY: 0.003,
+    /** @type {number} X deflection biquad filter Q factor (0.707 = Butterworth) */
+    filterQX: 0.75,
+    /** @type {number} Y deflection biquad filter Q factor (0.707 = Butterworth) */
+    filterQY: 0.75,
+    /** @type {number} X deflection gain multiplier */
+    filterGainX: 1.0,
+    /** @type {number} Y deflection gain multiplier */
+    filterGainY: 1.0,
     /** @type {number} Z beam intensity IIR filter retention (0 = no filter, 0.99 = heavy) */
     filterZ: 0.975,
     /** @type {string} Foreground color (phosphor green) */
@@ -83,10 +91,13 @@ export const CONTROL_BINDINGS = {
     'pixelScale':     { prop: 'pixelScale',         type: 'float' },
     'beamWidth':      { prop: 'beamWidth',          type: 'float' },
     'brightness':     { prop: 'brightness',         type: 'float' },
-    'filterCutoff':   { prop: 'filterCutoff',       type: 'logFloat', min: 0.0001, max: 0.5 },
-    'filterQ':        { prop: 'filterQ',            type: 'float' },
+    'filterCutoffX':  { prop: 'filterCutoffX',      type: 'logFloat', min: 0.0005, max: 0.05 },
+    'filterCutoffY':  { prop: 'filterCutoffY',      type: 'logFloat', min: 0.0005, max: 0.05 },
+    'filterQX':       { prop: 'filterQX',           type: 'float' },
+    'filterQY':       { prop: 'filterQY',           type: 'float' },
+    'filterGainX':    { prop: 'filterGainX',        type: 'float' },
+    'filterGainY':    { prop: 'filterGainY',        type: 'float' },
     'filterZ':        { prop: 'filterZ',            type: 'float' },
-    'blendMode':      { prop: 'blendMode',          type: 'string' },
     'detailChar':     { prop: 'detailChar',         type: 'string' },
     'detailMag':      { prop: 'detailMagnification', type: 'int' }
 };

@@ -154,14 +154,20 @@ function renderCharacterGaussian(ctx, char, cellPixelSize, offsetX, offsetY, con
         return;
     }
 
-    // Process through physics simulation
-    const xyCoeffs = calculateBiquadCoeffs(config.filterCutoff, config.filterQ);
+    // Process through physics simulation with separate X/Y parameters
+    const xCoeffs = calculateBiquadCoeffs(config.filterCutoffX, config.filterQX);
+    const yCoeffs = calculateBiquadCoeffs(config.filterCutoffY, config.filterQY);
     const filteredPositions = processCharacterPhysics(
         vectorData,
         PHYSICS_DEFAULTS.subsampleFactor,
-        xyCoeffs,
+        xCoeffs,
         config.filterZ,
-        config.characterScale
+        config.characterScale,
+        {
+            yCoeffs: yCoeffs,
+            xGain: config.filterGainX,
+            yGain: config.filterGainY
+        }
     );
 
     // Create float accumulation buffer for this cell
@@ -209,7 +215,7 @@ function renderCharacterGaussian(ctx, char, cellPixelSize, offsetX, offsetY, con
  */
 export const gaussianModeRenderer = {
     name: 'Gaussian Mode',
-    supportedControls: ['showGrid', 'showOrigin', 'characterScale', 'pixelScale', 'filterCutoff', 'filterQ', 'filterZ', 'brightness', 'beamWidth', 'blendMode', 'detailChar', 'detailMag'],
+    supportedControls: ['showGrid', 'showOrigin', 'characterScale', 'pixelScale', 'filterCutoffX', 'filterCutoffY', 'filterQX', 'filterQY', 'filterGainX', 'filterGainY', 'filterZ', 'brightness', 'beamWidth', 'detailChar', 'detailMag'],
 
     /**
      * Render the complete font atlas with Gaussian spots

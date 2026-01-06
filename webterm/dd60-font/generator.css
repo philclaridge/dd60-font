@@ -19,6 +19,37 @@ h1 .version {
     font-weight: normal;
 }
 
+.control-subheader {
+    color: #90EE90;
+    font-size: 0.9em;
+    margin: 8px 0 2px 0;
+}
+
+.y-control.synced {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+.checkbox-row {
+    display: flex;
+    justify-content: space-evenly;
+    margin: 12px 0;
+    padding: 8px 0;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+    color: #fff;
+}
+
+.checkbox-item input {
+    cursor: pointer;
+}
+
 .subtitle {
     margin-top: -10px;
     margin-bottom: 15px;
@@ -83,8 +114,6 @@ button:hover {
     flex-direction: column;
     gap: 8px;
     align-items: flex-start;
-    padding-top: 10px;
-    border-top: 1px solid #444;
 }
 
 .control-row {
@@ -94,7 +123,7 @@ button:hover {
 }
 
 .control-row label {
-    color: #888;
+    color: #fff;
     width: 160px;
     flex-shrink: 0;
     position: relative;
@@ -122,6 +151,11 @@ button:hover {
 
 .control-row input[type="range"] {
     width: 640px;
+    outline: none;
+}
+
+.control-row input[type="range"]:focus {
+    outline: none;
 }
 
 .control-row input[type="checkbox"] {

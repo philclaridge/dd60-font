@@ -34,16 +34,22 @@ function renderCharacterPhysics(ctx, char, cellPixelSize, offsetX, offsetY, conf
         return;
     }
 
-    // Calculate biquad coefficients from config
-    const xyCoeffs = calculateBiquadCoeffs(config.filterCutoff, config.filterQ);
+    // Calculate biquad coefficients from config (separate X/Y)
+    const xCoeffs = calculateBiquadCoeffs(config.filterCutoffX, config.filterQX);
+    const yCoeffs = calculateBiquadCoeffs(config.filterCutoffY, config.filterQY);
 
     // Process through physics simulation (characterScale applied BEFORE filtering)
     const filteredPositions = processCharacterPhysics(
         vectorData,
         PHYSICS_DEFAULTS.subsampleFactor,
-        xyCoeffs,
+        xCoeffs,
         config.filterZ,
-        config.characterScale
+        config.characterScale,
+        {
+            yCoeffs: yCoeffs,
+            xGain: config.filterGainX,
+            yGain: config.filterGainY
+        }
     );
 
     // Parse foreground color for alpha modulation
@@ -95,7 +101,7 @@ function renderCharacterPhysics(ctx, char, cellPixelSize, offsetX, offsetY, conf
  */
 export const crtModeRenderer = {
     name: 'CRT Mode',
-    supportedControls: ['showGrid', 'showOrigin', 'characterScale', 'pixelScale', 'filterCutoff', 'filterQ', 'filterZ', 'brightness', 'beamWidth', 'blendMode', 'detailChar', 'detailMag'],
+    supportedControls: ['showGrid', 'showOrigin', 'characterScale', 'pixelScale', 'filterCutoffX', 'filterCutoffY', 'filterQX', 'filterQY', 'filterGainX', 'filterGainY', 'filterZ', 'brightness', 'beamWidth', 'detailChar', 'detailMag'],
 
     /**
      * Render the complete font atlas with CRT physics

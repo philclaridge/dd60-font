@@ -132,15 +132,25 @@ export function applyIIR(input, prev, retention) {
  *
  * @param {import('../rom/decoder.js').VectorCoord[]} vectorData - Raw vector coordinates (0-6)
  * @param {number} subsampleFactor - Number of times to replicate each row
- * @param {BiquadCoeffs} xyCoeffs - X/Y biquad filter coefficients
+ * @param {BiquadCoeffs} xyCoeffs - X/Y biquad filter coefficients (shared, or X-only if yCoeffs provided)
  * @param {number} retentionZ - Beam intensity filter retention
  * @param {number} characterScale - Character scale multiplier (applied before filtering)
+ * @param {Object} [options] - Optional parameters
+ * @param {BiquadCoeffs} [options.yCoeffs] - Separate Y filter coefficients
+ * @param {number} [options.xGain=1.0] - X deflection gain multiplier
+ * @param {number} [options.yGain=1.0] - Y deflection gain multiplier
  * @returns {FilteredPosition[]} Filtered positions (in scaled coordinates)
  */
-export function processCharacterPhysics(vectorData, subsampleFactor, xyCoeffs, retentionZ, characterScale) {
+export function processCharacterPhysics(vectorData, subsampleFactor, xyCoeffs, retentionZ, characterScale, options = {}) {
     if (!vectorData || vectorData.length === 0) {
         return [];
     }
+
+    // Extract optional parameters with defaults
+    const xCoeffs = xyCoeffs;
+    const yCoeffs = options.yCoeffs || xyCoeffs;
+    const xGain = options.xGain ?? 1.0;
+    const yGain = options.yGain ?? 1.0;
 
     /** @type {FilteredPosition[]} */
     const filteredPositions = [];
@@ -159,9 +169,9 @@ export function processCharacterPhysics(vectorData, subsampleFactor, xyCoeffs, r
 
         // Replicate each row subsampleFactor times
         for (let s = 0; s < subsampleFactor; s++) {
-            // Apply biquad filter to scaled X and Y
-            const filteredX = applyBiquad(scaledX, xState, xyCoeffs);
-            const filteredY = applyBiquad(scaledY, yState, xyCoeffs);
+            // Apply biquad filter to scaled X and Y (with separate coefficients and gains)
+            const filteredX = applyBiquad(scaledX, xState, xCoeffs) * xGain;
+            const filteredY = applyBiquad(scaledY, yState, yCoeffs) * yGain;
             // Apply simple IIR to beam intensity
             zState = applyIIR(beam, zState, retentionZ);
 
